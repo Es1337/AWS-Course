@@ -70,6 +70,21 @@ export const handler = async (event: APIGatewayEvent, context: Context): Promise
           };
         }
     }
+    if (resource === '/videos' && httpMethod === 'POST') {
+    // at this point we are sure the body correct - request validator is guarding that
+    // we just need to parse it from string
+    // `!` is a TS trick - TS does not know that body was already validated
+    const dto = JSON.parse(event.body!)
+
+    // create a video
+    const video = createVideo(dto.title)
+
+    // return response
+    return {
+      statusCode: 201,
+      body: JSON.stringify(video)
+    };
+  }
     // in case someone tries to call our lambda with unknown resource return 404
     return {
         statusCode: 404,

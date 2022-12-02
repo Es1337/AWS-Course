@@ -31,5 +31,42 @@ export class FakeTubeStack extends cdk.Stack {
     
     const videoItemResource = videosResource.addResource('{id}')
     videoItemResource.addMethod("GET", videosIntegration);
+  
+  
+    // create model for payload validation
+  const videoModel = new apigateway.Model(this, "post-videos-validator", {
+    restApi: api,
+    contentType: "application/json",
+    description: "To validate video create payload",
+    modelName: "videomodelcdk",
+
+    // schema (allowed shape) of our payload
+    schema: {
+      type: apigateway.JsonSchemaType.OBJECT,
+      required: ["title"],
+      properties: {
+        title: { type: apigateway.JsonSchemaType.STRING },
+      },
+    }
+  });
+  
+    // create request validation API Gateway resource
+  const requestValidator = new apigateway.RequestValidator(
+    this,
+    "body-validator",
+    {
+      restApi: api,
+      requestValidatorName: "body-validator",
+      validateRequestBody: true,
+    }
+  );
+
+  // create new endpoint (POST /videos) - validator and model are configuration options
+  videosResource.addMethod('POST', videosIntegration, {
+    requestValidator,
+    requestModels: {
+      "$default": videoModel
+    },
+  });
   }
 }
