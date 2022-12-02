@@ -28,5 +28,8 @@ export class FakeTubeStack extends cdk.Stack {
     });
   
     videosResource.addMethod("GET", videosIntegration);
+    
+    const videoItemResource = videosResource.addResource('{id}')
+    videoItemResource.addMethod("GET", videosIntegration);
   }
 }

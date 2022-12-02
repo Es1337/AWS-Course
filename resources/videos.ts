@@ -52,10 +52,29 @@ export const handler = async (event: APIGatewayEvent, context: Context): Promise
             body: JSON.stringify({ videos })
         };
     }
-    
+    else if (resource === '/videos/{id}' && httpMethod === 'GET') {
+    const { pathParameters } = event;
+    const video = findVideo(pathParameters?.id!)
+
+    if (video) {
+      // if videos with specified id exist return 200
+      return {
+        statusCode: 200,
+        body: JSON.stringify(video)
+      };
+    } else {
+      // otherwise return 404 error
+          return {
+            statusCode: 404,
+            body: 'NotFound'
+          };
+        }
+    }
     // in case someone tries to call our lambda with unknown resource return 404
     return {
         statusCode: 404,
         body: 'NotFound'
     };
+
+    
 }
